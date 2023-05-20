@@ -49,14 +49,7 @@ public class StudentInfoController {
 	@PostMapping("/save")
 	@RequiresPermissions("student:studentInfo:add")
 	public R save(StudentInfoDO studentInfoDO){
-		//addUserId = ？ 从redis获取 从session获取
-		//studentInfoDO.setAddUserid(1);
-		List<UserOnline> list = sessionService.list();
-		for (UserOnline user : list){
-			if ("0:0:0:0:0:0:0:1".equals(user.getHost())){	//todo: 获取正在操作用户host
-				studentInfoDO.setAddUserid(Integer.valueOf(user.getUserId()));
-			}
-		}
+		studentInfoDO.setAddUserid(ShiroUtils.getUserId().intValue());
 		if(studentInfoService.save(studentInfoDO)>0){
 			return R.ok();
 		}
@@ -90,13 +83,7 @@ public class StudentInfoController {
 	@PostMapping("/update")
 	@RequiresPermissions("student:studentInfo:edit")
 	public R update(StudentInfoDO studentInfo){
-		//studentInfo.setEditUserid(1);
-		List<UserOnline> list = sessionService.list();
-		for (UserOnline user : list){
-			if ("0:0:0:0:0:0:0:1".equals(user.getHost())){	//todo: 获取正在操作用户host
-				studentInfo.setEditUserid(Integer.valueOf(user.getUserId()));
-			}
-		}
+		studentInfo.setEditUserid(ShiroUtils.getUserId().intValue());
 		studentInfoService.update(studentInfo);
 		return R.ok();
 	}
