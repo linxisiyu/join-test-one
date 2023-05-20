@@ -9,14 +9,21 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yizhi.common.annotation.Log;
 import com.yizhi.common.controller.BaseController;
+import com.yizhi.common.domain.WeixinUserPrincipal;
 import com.yizhi.common.utils.*;
 import com.yizhi.student.domain.ClassDO;
+import com.yizhi.student.domain.CollegeDO;
 import com.yizhi.student.service.ClassService;
 import com.yizhi.student.service.CollegeService;
 import com.yizhi.student.service.MajorService;
+import com.yizhi.system.domain.UserDO;
+import com.yizhi.system.domain.UserOnline;
+import com.yizhi.system.service.SessionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
@@ -32,20 +39,28 @@ import com.yizhi.student.service.StudentInfoService;
 @Controller
 @RequestMapping("/student/studentInfo")
 public class StudentInfoController {
-
-	
-
-
 	@Autowired
 	private StudentInfoService studentInfoService;
-    //
+	@Autowired
+	SessionService sessionService;
+
 	@Log("学生信息保存")
 	@ResponseBody
 	@PostMapping("/save")
 	@RequiresPermissions("student:studentInfo:add")
 	public R save(StudentInfoDO studentInfoDO){
-	
-		return null;
+		//addUserId = ？ 从redis获取 从session获取
+		//studentInfoDO.setAddUserid(1);
+		List<UserOnline> list = sessionService.list();
+		for (UserOnline user : list){
+			if ("0:0:0:0:0:0:0:1".equals(user.getHost())){	//todo: 获取正在操作用户host
+				studentInfoDO.setAddUserid(Integer.valueOf(user.getUserId()));
+			}
+		}
+		if(studentInfoService.save(studentInfoDO)>0){
+			return R.ok();
+		}
+		return R.error();
 	}
 
 	/**
@@ -55,9 +70,15 @@ public class StudentInfoController {
 	@GetMapping("/list")
 	@RequiresPermissions("student:studentInfo:studentInfo")
 	public PageUtils list(@RequestParam Map<String, Object> params){
-
-		return null;
-
+		if (params.get("sort")!=null) {
+			params.put("sort",BeanHump.camelToUnderline(params.get("sort").toString()));
+		}
+		//查询列表数据
+		Query query = new Query(params);
+		List<StudentInfoDO> collegeList = studentInfoService.list(query);
+		int total = studentInfoService.count(query);
+		PageUtils pageUtils = new PageUtils(collegeList, total,query.getCurrPage(),query.getPageSize());
+		return pageUtils;
 	}
 
 
@@ -69,8 +90,15 @@ public class StudentInfoController {
 	@PostMapping("/update")
 	@RequiresPermissions("student:studentInfo:edit")
 	public R update(StudentInfoDO studentInfo){
-
-		return null;
+		//studentInfo.setEditUserid(1);
+		List<UserOnline> list = sessionService.list();
+		for (UserOnline user : list){
+			if ("0:0:0:0:0:0:0:1".equals(user.getHost())){	//todo: 获取正在操作用户host
+				studentInfo.setEditUserid(Integer.valueOf(user.getUserId()));
+			}
+		}
+		studentInfoService.update(studentInfo);
+		return R.ok();
 	}
 
 	/**
@@ -81,7 +109,10 @@ public class StudentInfoController {
 	@ResponseBody
 	@RequiresPermissions("student:studentInfo:remove")
 	public R remove( Integer id){
-		return null;
+		if(studentInfoService.remove(id)>0){
+			return R.ok();
+		}
+		return R.error();
 	}
 	
 	/**
@@ -92,8 +123,8 @@ public class StudentInfoController {
 	@ResponseBody
 	@RequiresPermissions("student:studentInfo:batchRemove")
 	public R remove(@RequestParam("ids[]") Integer[] ids){
-
-		return null;
+		studentInfoService.batchRemove(ids);
+		return R.ok();
 	}
 
 

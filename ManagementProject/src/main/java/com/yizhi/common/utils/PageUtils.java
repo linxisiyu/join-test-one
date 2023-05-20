@@ -1,5 +1,7 @@
 package com.yizhi.common.utils;
 
+import com.yizhi.student.domain.StudentInfoDO;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -45,6 +47,8 @@ public class PageUtils implements Serializable {
 		this.currPage=currPage;
 		this.totalPages = (int) Math.ceil((double) total / pageSize);
 	}
+
+
 
 	public int getTotal() {
 		return total;

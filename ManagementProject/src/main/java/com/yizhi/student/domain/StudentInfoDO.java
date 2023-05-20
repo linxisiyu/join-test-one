@@ -67,6 +67,7 @@ public class StudentInfoDO implements Serializable {
 	private Date addTime;
 	//添加人
 	private Integer addUserid;
+
 	//修改时间
 	private Date editTime;
 	//修改人
@@ -84,7 +85,7 @@ public class StudentInfoDO implements Serializable {
 	public Integer getId() {
 		return id;
 	}
-	/**
+	/**f
 	 * 设置：学号
 	 */
 	public void setStudentId(String studentId) {

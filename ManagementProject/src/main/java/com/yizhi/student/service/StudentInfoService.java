@@ -15,7 +15,8 @@ import java.util.Map;
 public interface StudentInfoService {
 	
 	StudentInfoDO get(Integer id);
-	
+
+	//学生信息分页展示
 	List<StudentInfoDO> list(Map<String, Object> map);
 	
 	int count(Map<String, Object> map);

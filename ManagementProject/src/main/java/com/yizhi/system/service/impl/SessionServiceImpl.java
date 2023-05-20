@@ -51,6 +51,7 @@ public class SessionServiceImpl implements SessionService {
                 	continue;
 				}
                 UserDO userDO = (UserDO) PrimaryPrincipal;
+                userOnline.setUserId(userDO.getUserId().toString());
                 userOnline.setUsername(userDO.getUsername());
             }
             userOnline.setId((String) session.getId());

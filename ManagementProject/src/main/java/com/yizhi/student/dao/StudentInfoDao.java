@@ -18,16 +18,22 @@ import org.apache.ibatis.annotations.Param;
 public interface StudentInfoDao {
 
 	StudentInfoDO get(Integer id);
-	
+
+	//分页查询
 	List<StudentInfoDO> list(Map<String,Object> map);
-	
+
+	//查询学生总数
 	int count(Map<String,Object> map);
-	
+
+	//保存信息
 	int save(StudentInfoDO studentInfo);
-	
+
+	//更新信息
 	int update(StudentInfoDO studentInfo);
-	
+
+	//删除信息
 	int remove(Integer id);
-	
+
+	//批量删除信息
 	int batchRemove(Integer[] ids);
 }
